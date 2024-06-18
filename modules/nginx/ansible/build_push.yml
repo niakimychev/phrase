@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Build Docker image for NGINX
+      community.docker.docker_image:
+        build:
+          path: "../files"
+          tag: "{{ ECR_REPOSITORY_URL }}/nginx:${IMAGE_VERSION}"
+          no_cache: true
+          rm: true
+
+    - name: Login to AWS ECR
+      community.docker.docker_login:
+        username: AWS
+        password: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+        registry_url: "{{ ECR_REPOSITORY_URL }}"
+
+    - name: Push Docker image to ECR
+      community.docker.docker_image:
+        name: "nginx"
+        repository: "{{ ECR_REPOSITORY_URL }}/nginx:${IMAGE_VERSION}"
+        tag: "latest"
+        push: yes
+        source: local
