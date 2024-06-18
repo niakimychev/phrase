@@ -9,3 +9,7 @@ output "public_subnet_id" {
 output "private_subnet_ids" {
   value = aws_subnet.private_subnets.*.id
 }
+
+output "region" {
+  value = var.region
+}
