@@ -16,3 +16,9 @@ variable "vpc_id" {
 variable "ecs_cluster_name" {
   description = "Name of the ECS cluster"
 }
+
+variable "ecr_image" {
+  description = "ECR Image url"
+  type        = string
+}
+

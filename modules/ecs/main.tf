@@ -13,7 +13,7 @@ resource "aws_ecs_task_definition" "nginx" {
   container_definitions = jsonencode([
     {
       name      = "nginx"
-      image     = "public.ecr.aws/nginx/nginx:1.27-alpine"
+      image     = var.ecr_image
       cpu       = 256
       memory    = 512
       essential = true
