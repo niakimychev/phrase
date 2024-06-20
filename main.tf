@@ -22,7 +22,12 @@ provider "aws" {
 module "nginx" {
   source = "./modules/nginx"
 
-  ecr_repo_name = "phrase-nginx-repo"
+  private_route_table_ids = [module.vpc.private_route_table_id]
+  private_subnet_ids      = module.vpc.private_subnet_ids
+  vpc_id                  = module.vpc.vpc_id
+  sg_id                   = module.ecs.sg_id
+
+  ecr_repo_name = local.ecr_repo_name
   image_tag     = local.image_tag
   region        = local.region
 }

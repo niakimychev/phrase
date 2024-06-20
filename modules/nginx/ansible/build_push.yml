@@ -3,15 +3,32 @@
   connection: local
   gather_facts: no
   tasks:
+
+    - name: Remove existing Docker builder
+      ansible.builtin.command:
+        cmd: docker buildx rm phrase_builder
+      ignore_errors: yes
+
+    - name: Create a new Docker builder which supports buildx
+      ansible.builtin.command:
+        cmd: docker buildx create --name phrase_builder --use
+      register: buildx_create
+      failed_when: buildx_create.rc != 0 and "already exists" not in buildx_create.stderr
+
+    - name: Start up the builder instance
+      ansible.builtin.command:
+        cmd: docker buildx inspect --bootstrap
+
     - name: Build Docker image for NGINX
-      community.docker.docker_image:
-        name: "{{ ECR_REPOSITORY_URL }}:{{ IMAGE_VERSION }}"
-        source: build
-        build:
-          path: "../files"
-          nocache: true
-          rm: true
-        state: present
+      ansible.builtin.shell:
+        cmd: >-
+          docker buildx build
+          --platform linux/amd64
+          -t "{{ ECR_REPOSITORY_URL }}:{{ IMAGE_VERSION }}"
+          --push
+          --no-cache
+          ../files
+      register: docker_build
 
     - name: Get ECR token
       shell: "aws ecr get-login-password --region {{ REGION }}"
