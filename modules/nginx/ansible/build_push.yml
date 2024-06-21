@@ -13,15 +13,15 @@
       ansible.builtin.command:
         cmd: docker buildx create --name phrase_builder --use
       register: buildx_create
-      failed_when: buildx_create.rc != 0 and "already exists" not in buildx_create.stderr
 
     - name: Start up the builder instance
       ansible.builtin.command:
         cmd: docker buildx inspect --bootstrap
 
-    - name: Build Docker image for NGINX
+    - name: Build and push Docker image
       ansible.builtin.shell:
         cmd: >-
+          aws ecr get-login-password --region "{{ REGION }}" | docker login --username AWS --password-stdin "{{ ECR_REPOSITORY_URL }}" &&
           docker buildx build
           --platform linux/amd64
           -t "{{ ECR_REPOSITORY_URL }}:{{ IMAGE_VERSION }}"
@@ -29,26 +29,3 @@
           --no-cache
           ../files
       register: docker_build
-
-    - name: Get ECR token
-      shell: "aws ecr get-login-password --region {{ REGION }}"
-      register: ecr_token
-
-    - name: Login to AWS ECR
-      community.docker.docker_login:
-        username: AWS
-        password: "{{ lookup('pipe', 'aws ecr get-login-password --region ' + REGION) }}"
-        registry_url: "{{ ECR_REPOSITORY_URL }}"
-
-    - name: Tag Docker image
-      community.docker.docker_image:
-        name: "{{ ECR_REPOSITORY_URL }}:{{ IMAGE_VERSION }}"
-        repository: "{{ ECR_REPOSITORY_URL }}:{{ IMAGE_VERSION }}"
-        push: no
-        source: local
-
-    - name: Push Docker image to ECR
-      community.docker.docker_image:
-        name: "{{ ECR_REPOSITORY_URL }}:{{ IMAGE_VERSION }}"
-        push: yes
-        source: local

@@ -3,4 +3,4 @@ COPY ssl/nginx.crt /etc/nginx/ssl/nginx.crt
 COPY ssl/nginx.key /etc/nginx/ssl/nginx.key
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY html/index.html /usr/share/nginx/html/index.html
-EXPOSE 443
+EXPOSE 80 443

@@ -7,12 +7,15 @@ locals {
 
   # vpc
   vpc_cidr             = "10.0.0.0/16"
-  public_subnet_cidr   = "10.0.1.0/24"
   availability_zones   = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
-  private_subnet_cidrs = ["10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24"]
+  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnet_cidrs = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 
   # ecs
   ecs_cluster_name = "phrase_nginx_cluster"
+
+  #alb
+  alb_name = "phrase-alb"
 }
 
 provider "aws" {
@@ -37,7 +40,7 @@ module "vpc" {
 
   region               = local.region
   vpc_cidr             = local.vpc_cidr
-  public_subnet_cidr   = local.public_subnet_cidr
+  public_subnet_cidrs  = local.public_subnet_cidrs
   availability_zones   = local.availability_zones
   private_subnet_cidrs = local.private_subnet_cidrs
 }
@@ -50,4 +53,15 @@ module "ecs" {
   private_subnets  = module.vpc.private_subnet_ids
   ecs_cluster_name = local.ecs_cluster_name
   ecr_image        = "${module.nginx.ecr_repository_url}:${local.image_tag}"
+  alb_sg           = module.alb.sg
+  # target_group_http_arn  = module.alb.target_group_http_arn
+  target_group_https_arn = module.alb.target_group_https_arn
+}
+
+module "alb" {
+  source = "./modules/alb"
+
+  vpc_id   = module.vpc.vpc_id
+  subnets  = module.vpc.public_subnet_ids
+  alb_name = local.alb_name
 }

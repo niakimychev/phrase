@@ -15,6 +15,7 @@ variable "vpc_id" {
 
 variable "ecs_cluster_name" {
   description = "Name of the ECS cluster"
+  type        = string
 }
 
 variable "ecr_image" {
@@ -22,3 +23,17 @@ variable "ecr_image" {
   type        = string
 }
 
+variable "alb_sg" {
+  description = "ID of alb security group"
+  type        = string
+}
+
+# variable "target_group_http_arn" {
+#   description = "ARN of http target group"
+#   type        = string
+# }
+
+variable "target_group_https_arn" {
+  description = "ARN of https target group"
+  type        = string
+}

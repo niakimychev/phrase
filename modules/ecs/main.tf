@@ -22,6 +22,11 @@ resource "aws_ecs_task_definition" "nginx" {
           containerPort = 80
           hostPort      = 80
           protocol      = "tcp"
+        },
+        {
+          containerPort = 443
+          hostPort      = 443
+          protocol      = "tcp"
         }
       ]
       logConfiguration = {
@@ -35,6 +40,14 @@ resource "aws_ecs_task_definition" "nginx" {
     }
   ])
 }
+
+# resource "aws_appautoscaling_target" "ecs_target" {
+#   service_namespace  = "ecs"
+#   resource_id        = "service/${aws_ecs_cluster.nginx_cluster.name}/${aws_ecs_service.nginx_service.name}"
+#   scalable_dimension = "ecs:service:DesiredCount"
+#   min_capacity       = 1
+#   max_capacity       = 3
+# }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "phrase_ecs_task_execution_role"
@@ -71,25 +84,35 @@ resource "aws_ecs_service" "nginx_service" {
     security_groups  = [aws_security_group.nginx_sg.id]
   }
 
-  depends_on = [
-    aws_iam_role_policy_attachment.ecs_task_execution_role_policy
-  ]
+  # load_balancer {
+  # target_group_arn = var.target_group_http_arn
+  # container_name   = "nginx"
+  # container_port   = 80
+  # }
+
+  load_balancer {
+    target_group_arn = var.target_group_https_arn
+    container_name   = "nginx"
+    container_port   = 443
+  }
 }
 
 resource "aws_security_group" "nginx_sg" {
   vpc_id = var.vpc_id
 
-  # ingress {
-  #   from_port       = 80
-  #   to_port         = 80
-  #   protocol        = "tcp"
-  #   security_groups = [aws_security_group.alb_sg.id]
-  # }
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [var.alb_sg]
+  }
+
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    #security_groups = [var.alb_sg]
   }
 
   egress {
@@ -100,9 +123,10 @@ resource "aws_security_group" "nginx_sg" {
   }
 }
 
-resource "aws_security_group" "alb_sg" {
-  name   = "phrase_nginx_alb_sg"
-  vpc_id = var.vpc_id
+resource "aws_security_group" "ecr_vpc_endpoint_sg" {
+  name        = "ecr_vpc_endpoint_sg"
+  description = "Security group for ECR VPC endpoints"
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 443

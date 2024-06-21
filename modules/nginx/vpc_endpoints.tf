@@ -35,26 +35,6 @@ resource "aws_vpc_endpoint" "cloudwatch_logs" {
   private_dns_enabled = true
 }
 
-resource "aws_security_group" "ecr_vpc_endpoint_sg" {
-  name        = "ecr_vpc_endpoint_sg"
-  description = "Security group for ECR VPC endpoints"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_vpc_endpoint_route_table_association" "s3" {
   route_table_id  = var.private_route_table_ids[0]
   vpc_endpoint_id = aws_vpc_endpoint.s3.id

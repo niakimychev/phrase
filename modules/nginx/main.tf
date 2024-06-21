@@ -17,4 +17,8 @@ resource "null_resource" "nginx_docker_image" {
   provisioner "local-exec" {
     command = "ansible-playbook -i localhost, ${path.module}/ansible/build_push.yml -e ECR_REPOSITORY_URL=${self.triggers.image_id} -e IMAGE_VERSION=${self.triggers.image_version} -e REGION=${self.triggers.region}"
   }
+
+  depends_on = [
+    aws_ecr_repository.nginx
+  ]
 }
