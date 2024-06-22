@@ -22,11 +22,6 @@ resource "aws_ecs_task_definition" "nginx" {
           containerPort = 80
           hostPort      = 80
           protocol      = "tcp"
-        },
-        {
-          containerPort = 443
-          hostPort      = 443
-          protocol      = "tcp"
         }
       ]
       logConfiguration = {
@@ -41,13 +36,13 @@ resource "aws_ecs_task_definition" "nginx" {
   ])
 }
 
-# resource "aws_appautoscaling_target" "ecs_target" {
-#   service_namespace  = "ecs"
-#   resource_id        = "service/${aws_ecs_cluster.nginx_cluster.name}/${aws_ecs_service.nginx_service.name}"
-#   scalable_dimension = "ecs:service:DesiredCount"
-#   min_capacity       = 1
-#   max_capacity       = 3
-# }
+resource "aws_appautoscaling_target" "ecs_target" {
+  service_namespace  = "ecs"
+  resource_id        = "service/${aws_ecs_cluster.nginx_cluster.name}/${aws_ecs_service.nginx_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = 1
+  max_capacity       = 3
+}
 
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "phrase_ecs_task_execution_role"
@@ -84,16 +79,10 @@ resource "aws_ecs_service" "nginx_service" {
     security_groups  = [aws_security_group.nginx_sg.id]
   }
 
-  # load_balancer {
-  # target_group_arn = var.target_group_http_arn
-  # container_name   = "nginx"
-  # container_port   = 80
-  # }
-
   load_balancer {
-    target_group_arn = var.target_group_https_arn
+    target_group_arn = var.target_group_http_arn
     container_name   = "nginx"
-    container_port   = 443
+    container_port   = 80
   }
 }
 

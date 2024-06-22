@@ -28,12 +28,7 @@ variable "alb_sg" {
   type        = string
 }
 
-# variable "target_group_http_arn" {
-#   description = "ARN of http target group"
-#   type        = string
-# }
-
-variable "target_group_https_arn" {
-  description = "ARN of https target group"
+variable "target_group_http_arn" {
+  description = "ARN of http target group"
   type        = string
 }

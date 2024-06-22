@@ -8,14 +8,9 @@ output "alb_dns_name" {
   description = "The DNS name of the ALB"
 }
 
-# output "target_group_http_arn" {
-#   value       = aws_lb_target_group.http.arn
-#   description = "The ARN of http target group"
-# }
-
-output "target_group_https_arn" {
-  value       = aws_lb_target_group.https.arn
-  description = "The ARN of https target group"
+output "target_group_http_arn" {
+  value       = aws_lb_target_group.http.arn
+  description = "The ARN of http target group"
 }
 
 output "sg" {

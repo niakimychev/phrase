@@ -48,14 +48,13 @@ module "vpc" {
 module "ecs" {
   source = "./modules/ecs"
 
-  vpc_id           = module.vpc.vpc_id
-  region           = module.vpc.region
-  private_subnets  = module.vpc.private_subnet_ids
-  ecs_cluster_name = local.ecs_cluster_name
-  ecr_image        = "${module.nginx.ecr_repository_url}:${local.image_tag}"
-  alb_sg           = module.alb.sg
-  # target_group_http_arn  = module.alb.target_group_http_arn
-  target_group_https_arn = module.alb.target_group_https_arn
+  vpc_id                = module.vpc.vpc_id
+  region                = module.vpc.region
+  private_subnets       = module.vpc.private_subnet_ids
+  ecs_cluster_name      = local.ecs_cluster_name
+  ecr_image             = "${module.nginx.ecr_repository_url}:${local.image_tag}"
+  alb_sg                = module.alb.sg
+  target_group_http_arn = module.alb.target_group_http_arn
 }
 
 module "alb" {
