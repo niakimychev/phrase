@@ -64,3 +64,7 @@ module "alb" {
   subnets  = module.vpc.public_subnet_ids
   alb_name = local.alb_name
 }
+
+output "website_url" {
+  value = format("Now you can open the website via: https://%s", module.alb.cloudfront_distribution_domain_name)
+}

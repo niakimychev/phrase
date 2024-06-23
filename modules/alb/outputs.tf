@@ -17,3 +17,7 @@ output "sg" {
   value       = aws_security_group.alb_sg.id
   description = "The ID of security group"
 }
+
+output "cloudfront_distribution_domain_name" {
+  value = aws_cloudfront_distribution.phrase.domain_name
+}
