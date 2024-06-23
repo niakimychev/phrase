@@ -1,5 +1,14 @@
 # Phrase
 
+## Description
+
+- Ansible is used to build and deploy the Nginx Docker image to ECR. 
+- It includes a sample Nginx configuration with a simple index.html file. 
+- The VPC consists of three public and three private subnets. 
+- Three Nginx applications are deployed in ECS Fargate, connected to an Application Load Balancer (ALB). 
+- To enable ECS tasks located in private subnets to communicate with the ECR registry, VPC endpoints have been created. 
+- If modifications are needed, you can adjust the corresponding local variables in the main.tf file located in the project's root directory.
+
 ## Dependencies
 
 - Terraform >= 0.12
@@ -37,6 +46,38 @@
 3. You can open the website by the cloudfront url provided in terminal.
 
 ## Project Structure
+
+```
+phrase/
+├── main.tf
+├── modules/
+│   ├── alb/
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── ecs/
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── nginx/
+│   │   ├── ansible/
+│   │   │   └── build_push.yml
+│   │   ├── files/
+│   │   │   ├── Dockerfile
+│   │   │   ├── nginx.conf
+│   │   │   └── html/
+│   │   │       └── index.html
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   ├── variables.tf
+│   │   └── vpc_endpoints.tf
+│   └── vpc/
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+```
+
+
 
 - `main.tf`: The main Terraform configuration file.
 - `modules/`: Contains Terraform modules for different components:
